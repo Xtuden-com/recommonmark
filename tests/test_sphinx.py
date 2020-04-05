@@ -226,3 +226,11 @@ class CustomExtensionTests(SphinxIntegrationTests):
              '</ul>\n</li>\n</ul>'),
             output
             )
+
+
+class MathBlockTests(unittest.TestCase):
+    build_path = 'tests/sphinx_inline_math'
+
+    def test_integration(self):
+        with sphinx_built_file('sphinx_inline_math', '_build/text/index.html') as output:
+            self.assertIn('MathJax', output)
