@@ -73,9 +73,13 @@ class CommonMarkParser(parsers.Parser):
             fn_name = 'visit_{0}'.format(mdnode.t)
             parent = self.current_node.parent
             if not hasattr(self, fn_name) and parent is not None:
-                warn("Container node skipped: type={0} src={1} line={2}".format(mdnode.t, parent.source, parent.line))
+                warn("Container node skipped: type={0} src={1} line={2}".format(
+                    mdnode.t, parent.source, parent.line))
             else:
                 self.current_node = parent
+
+    def visit_document(self, mdnode):
+        pass
 
     def visit_heading(self, mdnode):
         # Test if we're replacing a section level first
@@ -162,6 +166,7 @@ class CommonMarkParser(parsers.Parser):
         # the Sphinx conf.py file but how to access this information?
         if not scheme_known and ext.replace('.', '') in self.supported:
             destination = destination.replace(ext, '')
+
         ref_node['refuri'] = destination
         # TODO okay, so this is acutally not always the right line number, but
         # these mdnodes won't have sourcepos on them for whatever reason. This

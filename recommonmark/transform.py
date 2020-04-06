@@ -90,6 +90,17 @@ class AutoStructify(transforms.Transform):
         abspath = os.path.abspath(os.path.join(self.file_dir, uri))
         relpath = os.path.relpath(abspath, self.root_dir)
         suffix = abspath.rsplit('.', 1)
+
+        if len(suffix) == 1:
+            # no suffix, try to insert one to see if it matches an existing file
+            for suff in AutoStructify.suffix_set:
+                test_abspath = abspath + "." + suff
+                if os.path.exists(test_abspath):
+                    abspath = test_abspath
+                    relpath += "." + suff
+                    suffix.append(suff)
+                    break
+
         if len(suffix) == 2 and suffix[1] in AutoStructify.suffix_set and (
                 os.path.exists(abspath) and abspath.startswith(self.root_dir)):
             # replace the path separator if running on non-UNIX environment
