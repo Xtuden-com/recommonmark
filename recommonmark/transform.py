@@ -15,6 +15,14 @@ from .states import DummyStateMachine
 sphinx_version = [ int(semver_num) for semver_num in sphinx_version.split(".") ]
 
 
+def _to_iter(obj):
+    """Helper to always make obj iterable (incl. strings).
+    """
+    if isinstance(obj, str) or not hasattr(obj, "__iter__"):
+        return [obj]
+    return obj
+
+
 class AutoStructify(transforms.Transform):
 
     """Automatically try to transform blocks to sphinx directives.
@@ -142,7 +150,8 @@ class AutoStructify(transforms.Transform):
             return None
         # when auto_toc_tree_section is set
         # only auto generate toctree under the specified section title
-        sec = self.config['auto_toc_tree_section']
+        sec = _to_iter(self.config['auto_toc_tree_section'])
+
         if sec is not None:
             if node.parent is None:
                 return None
@@ -157,7 +166,7 @@ class AutoStructify(transforms.Transform):
                     title = node.parent.parent.children[child]
             if not title:
                 return None
-            if title.astext().strip() != sec:
+            if title.astext().strip() not in sec:
                 return None
 
         numbered = None
