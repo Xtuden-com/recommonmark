@@ -79,6 +79,8 @@ class AutoStructify(transforms.Transform):
             docpath is the absolute document path to the document, if
             the target corresponds to an internal document, this can bex None
         """
+        # if ref.parent.source == '/home/griatch/Devel/Home/evennia/evennia/docs/source/index.md':
+        #     from pudb import debugger;debugger.Debugger().set_trace()
         title = None
         if len(ref.children) == 0:
             title = ref['name'] if 'name' in ref else None
@@ -185,8 +187,10 @@ class AutoStructify(transforms.Transform):
             par = nd.children[0]
             if not isinstance(par, nodes.paragraph):
                 return None
-            if len(par.children) != 1:
-                return None
+            # NOTE: Evennia - remove this to make toctrees easier to create
+            # (allow to make a toctree also if there are describing text)
+            # if len(par.children) != 1:
+            #     return None
             ref = par.children[0]
             if isinstance(ref, addnodes.pending_xref):
                 ref = ref.children[0]
@@ -209,6 +213,23 @@ class AutoStructify(transforms.Transform):
                 'numbered': numbered,
             },
             content=['%s <%s>' % (k, v) for k, v in refs])
+
+    def lone_ref(self, ref):
+        """
+        Handle a single reference, outside of a toc-tree. We make sure to parse
+        it so it goes through the custom url_resolver defined in settings.
+
+        """
+        title, uri, docpath = self.parse_ref(ref)
+
+        if title is None or uri.startswith("#"):
+            return None
+        if docpath:
+            uri = docpath
+
+        ref['title'] = title
+        ref['refuri'] = uri
+        return ref
 
     def auto_inline_code(self, node):
         """Try to automatically generate nodes for inline literals.
@@ -312,6 +333,8 @@ class AutoStructify(transforms.Transform):
             newnode = self.auto_code_block(node)
         elif isinstance(node, nodes.literal):
             newnode = self.auto_inline_code(node)
+        elif isinstance(node, nodes.reference):
+            newnode = self.lone_ref(node)
         return newnode
 
     def traverse(self, node):

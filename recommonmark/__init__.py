@@ -14,4 +14,11 @@ def setup(app):
     elif sphinx.version_info >= (1, 4):
         app.add_source_parser('.md', CommonMarkParser)
 
+    app.add_config_value(
+        'recommonmark_config', {
+            'url_resolver': lambda x: x,
+            'auto_toc_tree_section': ["Index"],
+            },
+        True)
+
     return {'version': __version__, 'parallel_read_safe': True}
