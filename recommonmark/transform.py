@@ -250,7 +250,7 @@ class AutoStructify(transforms.Transform):
         if not isinstance(content, nodes.Text):
             return None
         content = content.astext().strip()
-        if content.startswith('$') and content.endswith('$'):
+        if len(content) > 1 and content.startswith('$') and content.endswith('$'):
             if not self.config['enable_inline_math']:
                 return None
             content = content[1:-1]
