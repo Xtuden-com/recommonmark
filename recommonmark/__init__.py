@@ -18,6 +18,7 @@ def setup(app):
         'recommonmark_config', {
             'url_resolver': lambda x: x,
             'auto_toc_tree_section': ["Index"],
+            'code_highlight_options': {"force": False}
             },
         True)
 

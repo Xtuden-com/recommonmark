@@ -61,6 +61,7 @@ class AutoStructify(transforms.Transform):
         'commonmark_suffixes': ['.md'],
         'url_resolver': lambda x: x,
         'known_url_schemes': None,
+        'code_highlight_options': {},
     }
 
     def parse_ref(self, ref):
@@ -301,6 +302,7 @@ class AutoStructify(transforms.Transform):
         else:
             match = re.search('[ ]?[\w_-]+::.*', language)
             if match:
+                # shorthand to eval_rst, like important::A note in markdown!
                 parser = Parser()
                 new_doc = new_document(None, self.document.settings)
                 newsource = u'.. ' + match.group(0) + '\n' + node.rawsource
@@ -309,6 +311,7 @@ class AutoStructify(transforms.Transform):
             else:
                 return self.state_machine.run_directive(
                     'code-block', arguments=[language],
+                    options=self.config.get('code_highlight_options', {}),
                     content=content)
         return None
 
