@@ -221,12 +221,16 @@ class AutoStructify(transforms.Transform):
         it so it goes through the custom url_resolver defined in settings.
 
         """
+
         title, uri, docpath = self.parse_ref(ref)
 
         if title is None or uri.startswith("#"):
             return None
         if docpath:
             uri = docpath
+        if uri.startswith("/"):
+            # if we don't remove this the system things this is an absolute path
+            uri = uri[1:]
 
         ref['title'] = title
         ref['refuri'] = uri
